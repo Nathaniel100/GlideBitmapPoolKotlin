@@ -3,9 +3,7 @@ package io.github.loveginger.library.glidebitmappool
 import android.graphics.Bitmap
 import android.graphics.Bitmap.Config
 import android.os.Build
-import android.util.Log
 import java.util.Collections
-import kotlin.collections.HashSet
 
 class LruBitmapPool(private val initializeMaxSize: Long,
     private val allowedConfigs: Set<Bitmap.Config?> = defaultAllowedConfigs,
@@ -40,8 +38,8 @@ class LruBitmapPool(private val initializeMaxSize: Long,
 
     if (!bitmap.isMutable || strategy.getSize(bitmap) > maxSize || !allowedConfigs.contains(
             bitmap.config)) {
-      if (Log.isLoggable(TAG, Log.VERBOSE)) {
-        Log.v(TAG, "Reject bitmap from pool," +
+      if (Logger.isLoggable(TAG, Logger.VERBOSE)) {
+        Logger.v(TAG, "Reject bitmap from pool," +
             " bitmap: ${strategy.logBitmap(bitmap)}," +
             " is mutable: ${bitmap.isMutable}," +
             " is allowed config: ${allowedConfigs.contains(bitmap.config)}")
@@ -56,8 +54,8 @@ class LruBitmapPool(private val initializeMaxSize: Long,
     puts++
     currentSize += size
 
-    if (Log.isLoggable(TAG, Log.VERBOSE)) {
-      Log.v(TAG, "Put bitmap in pool=${strategy.logBitmap(bitmap)}")
+    if (Logger.isLoggable(TAG, Logger.VERBOSE)) {
+      Logger.v(TAG, "Put bitmap in pool=${strategy.logBitmap(bitmap)}")
     }
 
     dump()
@@ -98,8 +96,8 @@ class LruBitmapPool(private val initializeMaxSize: Long,
       tracker.remove(removed)
       currentSize -= strategy.getSize(removed)
       evictions++
-      if (Log.isLoggable(TAG, Log.DEBUG)) {
-        Log.d(TAG, "Evicting bitmap=${strategy.logBitmap(removed)}")
+      if (Logger.isLoggable(TAG, Logger.DEBUG)) {
+        Logger.d(TAG, "Evicting bitmap=${strategy.logBitmap(removed)}")
       }
       dump()
       removed.recycle()
