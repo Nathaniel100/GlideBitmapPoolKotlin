@@ -5,6 +5,8 @@ import android.graphics.Bitmap
 interface BitmapPool {
   fun get(width: Int, height: Int, config: Bitmap.Config?): Bitmap
 
+  fun getDirty(width: Int, height: Int, config: Bitmap.Config?): Bitmap
+
   fun put(bitmap: Bitmap)
 
   fun getMaxSize(): Long

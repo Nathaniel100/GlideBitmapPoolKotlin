@@ -7,11 +7,11 @@ interface LruPoolStrategy {
 
   fun get(width: Int, height: Int, config: Bitmap.Config)
 
-  fun removeLast()
+  fun removeLast(): Bitmap
 
   fun logBitmap(bitmap: Bitmap): String
 
   fun logBitmap(width: Int, height: Int, config: Bitmap.Config)
 
-  fun getSize(bitmap: Bitmap)
+  fun getSize(bitmap: Bitmap): Long
 }
