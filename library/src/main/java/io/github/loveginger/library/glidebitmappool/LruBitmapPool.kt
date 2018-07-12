@@ -1,32 +1,90 @@
 package io.github.loveginger.library.glidebitmappool
 
+import android.annotation.TargetApi
 import android.graphics.Bitmap
 import android.graphics.Bitmap.Config
+import android.graphics.Color
 import android.os.Build
+import android.support.annotation.VisibleForTesting
+import android.util.Log
 import java.util.Collections
+import kotlin.collections.HashSet
 
 class LruBitmapPool(private val initializeMaxSize: Long,
     private val allowedConfigs: Set<Bitmap.Config?> = defaultAllowedConfigs,
     private val strategy: LruPoolStrategy = defaultStrategy) : BitmapPool {
   private val tracker: BitmapTracker = NullBitmapTracker()
 
-  private var maxSize: Long = initializeMaxSize
-  private var currentSize: Long = 0
-  private var hits: Int = 0
-  private var misses: Int = 0
-  private var puts: Int = 0
-  private var evictions: Int = 0
+  @JvmField
+  @VisibleForTesting
+  var maxSize: Long = initializeMaxSize
+
+  @JvmField
+  @VisibleForTesting
+  var currentSize: Long = 0
+
+  @JvmField
+  @VisibleForTesting
+  var hits: Int = 0
+
+  @JvmField
+  @VisibleForTesting
+  var misses: Int = 0
+
+  @JvmField
+  @VisibleForTesting
+  var puts: Int = 0
+
+  @JvmField
+  @VisibleForTesting
+  var evictions: Int = 0
 
   @Synchronized
   override fun get(width: Int, height: Int, config: Config?): Bitmap {
-    TODO(
-        "not implemented") //To change body of created functions use File | Settings | File Templates.
+    return getDirtyOrNull(width, height, config).apply { this?.eraseColor(Color.TRANSPARENT) }
+        ?: strategy.createBitmap(width, height, config)
   }
 
   @Synchronized
   override fun getDirty(width: Int, height: Int, config: Config?): Bitmap {
-    TODO(
-        "not implemented") //To change body of created functions use File | Settings | File Templates.
+    return getDirtyOrNull(width, height, config) ?: strategy.createBitmap(width, height, config)
+  }
+
+
+  @Synchronized
+  private fun getDirtyOrNull(width: Int, height: Int, config: Config?): Bitmap? {
+    assertNotHardwareConfig(config)
+    val result = strategy.get(width, height, config ?: DEFAULT_CONFIG)
+    if (result == null) {
+      if (Logger.isLoggable(TAG, Log.DEBUG)) {
+        Logger.d(TAG, "Missing bitmap=${strategy.logBitmap(width, height, config)}")
+      }
+      misses++
+    } else {
+      hits++
+      currentSize -= strategy.getSize(result)
+      tracker.remove(result)
+      normalize(result)
+    }
+
+    if (Logger.isLoggable(TAG, Log.VERBOSE)) {
+      Logger.v(TAG, "Get bitmap=${strategy.logBitmap(width, height, config)}")
+    }
+
+    dump()
+    return result
+  }
+
+  private fun normalize(bitmap: Bitmap) {
+    bitmap.setHasAlpha(true)
+    maybeSetPreMultipied(bitmap)
+  }
+
+  @TargetApi(Build.VERSION_CODES.KITKAT)
+  private fun maybeSetPreMultipied(bitmap: Bitmap) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+      bitmap.isPremultiplied = true
+    }
   }
 
 
@@ -64,7 +122,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
   }
 
   override fun getMaxSize(): Long {
-    return maxSize;
+    return maxSize
   }
 
   override fun setSizeMultipiler(sizeMultiplier: Float) {
@@ -82,7 +140,14 @@ class LruBitmapPool(private val initializeMaxSize: Long,
   }
 
   private fun dump() {
+    if (Logger.isLoggable(TAG, Log.VERBOSE)) {
+      dumpUnchecked()
+    }
+  }
 
+  private fun dumpUnchecked() {
+    Logger.v(TAG, "Hits=$hits, misses=$misses, puts=$misses, evictions=$evictions," +
+        " currentSize=$currentSize, maxSize=$maxSize\nStrategy=$strategy")
   }
 
   private fun evict() {
@@ -146,5 +211,18 @@ class LruBitmapPool(private val initializeMaxSize: Long,
           TODO("AttributeStrategy")
         }
       }
+
+    val DEFAULT_CONFIG = Bitmap.Config.ARGB_8888
+
+    @TargetApi(Build.VERSION_CODES.O)
+    private fun assertNotHardwareConfig(config: Config?) {
+      if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O) {
+        return
+      }
+
+      if (config == Bitmap.Config.HARDWARE) {
+        throw IllegalArgumentException("Cannot create a mutable Bitmap with config: $config.")
+      }
+    }
   }
 }
