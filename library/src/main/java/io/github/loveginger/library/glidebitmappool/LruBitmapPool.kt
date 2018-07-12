@@ -1,6 +1,7 @@
 package io.github.loveginger.library.glidebitmappool
 
 import android.annotation.TargetApi
+import android.content.ComponentCallbacks2
 import android.graphics.Bitmap
 import android.graphics.Bitmap.Config
 import android.graphics.Color
@@ -131,12 +132,22 @@ class LruBitmapPool(private val initializeMaxSize: Long,
   }
 
   override fun clearMemory() {
+    if (Logger.isLoggable(TAG, Logger.DEBUG)) {
+      Logger.d(TAG, "clearMemory")
+    }
     trimToSize(0)
   }
 
   override fun trimMemory(level: Int) {
-    TODO(
-        "not implemented") //To change body of created functions use File | Settings | File Templates.
+    if (Logger.isLoggable(TAG, Log.DEBUG)) {
+      Log.d(TAG, "trimMemory, level=$level")
+    }
+    if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
+      clearMemory()
+    } else if (level >= ComponentCallbacks2.TRIM_MEMORY_UI_HIDDEN
+        || level == ComponentCallbacks2.TRIM_MEMORY_RUNNING_CRITICAL) {
+      trimToSize(getMaxSize() / 2)
+    }
   }
 
   private fun dump() {
