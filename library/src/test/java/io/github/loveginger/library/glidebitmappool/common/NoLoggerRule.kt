@@ -20,6 +20,7 @@ class NoLoggerRule : TestRule {
             return false
           }
         }
+        base?.evaluate()
       }
     }
   }
