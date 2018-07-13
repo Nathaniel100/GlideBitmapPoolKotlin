@@ -7,7 +7,6 @@ import android.graphics.Bitmap.Config
 import android.graphics.Color
 import android.os.Build
 import android.support.annotation.VisibleForTesting
-import android.util.Log
 import java.util.Collections
 import kotlin.collections.HashSet
 
@@ -57,7 +56,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
     assertNotHardwareConfig(config)
     val result = strategy.get(width, height, config ?: DEFAULT_CONFIG)
     if (result == null) {
-      if (Logger.isLoggable(TAG, Log.DEBUG)) {
+      if (Logger.isLoggable(TAG, Logger.DEBUG)) {
         Logger.d(TAG, "Missing bitmap=${strategy.logBitmap(width, height, config)}")
       }
       misses++
@@ -68,7 +67,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
       normalize(result)
     }
 
-    if (Logger.isLoggable(TAG, Log.VERBOSE)) {
+    if (Logger.isLoggable(TAG, Logger.VERBOSE)) {
       Logger.v(TAG, "Get bitmap=${strategy.logBitmap(width, height, config)}")
     }
 
@@ -139,8 +138,8 @@ class LruBitmapPool(private val initializeMaxSize: Long,
   }
 
   override fun trimMemory(level: Int) {
-    if (Logger.isLoggable(TAG, Log.DEBUG)) {
-      Log.d(TAG, "trimMemory, level=$level")
+    if (Logger.isLoggable(TAG, Logger.DEBUG)) {
+      Logger.d(TAG, "trimMemory, level=$level")
     }
     if (level >= ComponentCallbacks2.TRIM_MEMORY_BACKGROUND) {
       clearMemory()
@@ -151,7 +150,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
   }
 
   private fun dump() {
-    if (Logger.isLoggable(TAG, Log.VERBOSE)) {
+    if (Logger.isLoggable(TAG, Logger.VERBOSE)) {
       dumpUnchecked()
     }
   }
@@ -169,6 +168,14 @@ class LruBitmapPool(private val initializeMaxSize: Long,
   private fun trimToSize(size: Long) {
     while (currentSize > size) {
       val removed = strategy.removeLast()
+      if (removed == null) {
+        if (Logger.isLoggable(TAG, Logger.WARN)) {
+          Logger.w(TAG, "Size mismatch, resetting")
+          dumpUnchecked()
+        }
+        currentSize = 0
+        return
+      }
       tracker.remove(removed)
       currentSize -= strategy.getSize(removed)
       evictions++
@@ -219,7 +226,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
           TODO("SizeConfigStrategy")
         } else {
-          TODO("AttributeStrategy")
+          return AttributeStrategy(BitmapHelperObject)
         }
       }
 
