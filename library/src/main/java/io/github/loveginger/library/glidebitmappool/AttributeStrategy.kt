@@ -32,8 +32,8 @@ class AttributeStrategy(private val bitmapHelper: BitmapHelper) : LruPoolStrateg
     return bitmapHelper.getBitmapString(width, height, config)
   }
 
-  override fun getSize(bitmap: Bitmap): Long {
-    return bitmapHelper.getBitmapByteSize(bitmap).toLong()
+  override fun getSize(bitmap: Bitmap?): Long {
+    return if (bitmap == null) 0 else bitmapHelper.getBitmapByteSize(bitmap).toLong()
   }
 
   private class Key(private val bitmapHelper: BitmapHelper,

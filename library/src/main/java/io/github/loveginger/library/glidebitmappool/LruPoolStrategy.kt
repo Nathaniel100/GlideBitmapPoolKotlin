@@ -16,5 +16,5 @@ interface LruPoolStrategy {
 
   fun logBitmap(width: Int, height: Int, config: Bitmap.Config?): String
 
-  fun getSize(bitmap: Bitmap): Long
+  fun getSize(bitmap: Bitmap?): Long
 }
