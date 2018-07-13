@@ -5,39 +5,38 @@ import java.io.PrintWriter
 import java.io.StringWriter
 import java.net.UnknownHostException
 
-
 object Logger {
   var delegate: LoggerDelegate = DefaultLoggerDelegate()
 
   /**
    * Priority constant for the println method; use Log.v.
    */
-  val VERBOSE = Log.VERBOSE
+  const val VERBOSE = Log.VERBOSE
 
   /**
    * Priority constant for the println method; use Log.d.
    */
-  val DEBUG = Log.DEBUG
+  const val DEBUG = Log.DEBUG
 
   /**
    * Priority constant for the println method; use Log.i.
    */
-  val INFO = Log.INFO
+  const val INFO = Log.INFO
 
   /**
    * Priority constant for the println method; use Log.w.
    */
-  val WARN = Log.WARN
+  const val WARN = Log.WARN
 
   /**
    * Priority constant for the println method; use Log.e.
    */
-  val ERROR = Log.ERROR
+  const val ERROR = Log.ERROR
 
   /**
    * Priority constant for the println method.
    */
-  val ASSERT = Log.ASSERT
+  const val ASSERT = Log.ASSERT
 
   fun v(tag: String, msg: String): Int {
     return println(VERBOSE, tag, msg)
