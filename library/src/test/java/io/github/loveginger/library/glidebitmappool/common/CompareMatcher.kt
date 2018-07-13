@@ -1,5 +1,3 @@
-// Copyright (c) CFCA 2018. All Rights Reserved.
-
 package io.github.loveginger.library.glidebitmappool.common
 
 import org.hamcrest.CoreMatchers.*
