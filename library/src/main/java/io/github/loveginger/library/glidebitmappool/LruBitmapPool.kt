@@ -7,6 +7,7 @@ import android.graphics.Bitmap.Config
 import android.graphics.Color
 import android.os.Build
 import android.support.annotation.VisibleForTesting
+import io.github.loveginger.library.glidebitmappool.BitmapHelperObject.DEFAULT_CONFIG
 import java.util.Collections
 import kotlin.collections.HashSet
 
@@ -216,7 +217,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-          configs.remove(Bitmap.Config.HARDWARE);
+          configs.remove(Bitmap.Config.HARDWARE)
         }
         return Collections.unmodifiableSet(configs)
       }
@@ -230,7 +231,6 @@ class LruBitmapPool(private val initializeMaxSize: Long,
         }
       }
 
-    val DEFAULT_CONFIG = Bitmap.Config.ARGB_8888
 
     @TargetApi(Build.VERSION_CODES.O)
     private fun assertNotHardwareConfig(config: Config?) {

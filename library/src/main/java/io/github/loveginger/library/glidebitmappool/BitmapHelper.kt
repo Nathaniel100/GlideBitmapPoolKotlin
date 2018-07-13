@@ -20,8 +20,10 @@ interface BitmapHelper {
 
 object BitmapHelperObject : BitmapHelper {
 
+  val DEFAULT_CONFIG = Bitmap.Config.ARGB_8888
+
   override fun createBitmap(width: Int, height: Int, config: Bitmap.Config?): Bitmap {
-    return Bitmap.createBitmap(width, height, config)
+    return Bitmap.createBitmap(width, height, config ?: DEFAULT_CONFIG)
   }
 
   override fun getBitmapString(bitmap: Bitmap): String {
