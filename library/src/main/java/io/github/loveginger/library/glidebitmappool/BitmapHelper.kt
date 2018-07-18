@@ -2,6 +2,7 @@ package io.github.loveginger.library.glidebitmappool
 
 import android.graphics.Bitmap
 import android.os.Build
+import io.github.loveginger.library.glidebitmappool.LruBitmapPool.Companion.DEFAULT_CONFIG
 
 interface BitmapHelper {
   fun createBitmap(width: Int, height: Int, config: Bitmap.Config?): Bitmap
@@ -9,6 +10,8 @@ interface BitmapHelper {
   fun getBitmapString(bitmap: Bitmap): String
 
   fun getBitmapString(width: Int, height: Int, config: Bitmap.Config?): String
+
+  fun getBitmapString(size: Int, config: Bitmap.Config?): String
 
   fun getBitmapByteSize(bitmap: Bitmap): Int
 
@@ -20,8 +23,6 @@ interface BitmapHelper {
 
 object BitmapHelperObject : BitmapHelper {
 
-  val DEFAULT_CONFIG = Bitmap.Config.ARGB_8888
-
   override fun createBitmap(width: Int, height: Int, config: Bitmap.Config?): Bitmap {
     return Bitmap.createBitmap(width, height, config ?: DEFAULT_CONFIG)
   }
@@ -32,6 +33,10 @@ object BitmapHelperObject : BitmapHelper {
 
   override fun getBitmapString(width: Int, height: Int, config: Bitmap.Config?): String {
     return "[$width x $height], $config"
+  }
+
+  override fun getBitmapString(size: Int, config: Bitmap.Config?): String {
+    return "[$size]($config)"
   }
 
   override fun getBitmapByteSize(bitmap: Bitmap): Int {

@@ -7,7 +7,6 @@ import android.graphics.Bitmap.Config
 import android.graphics.Color
 import android.os.Build
 import android.support.annotation.VisibleForTesting
-import io.github.loveginger.library.glidebitmappool.BitmapHelperObject.DEFAULT_CONFIG
 import java.util.Collections
 import kotlin.collections.HashSet
 
@@ -207,6 +206,7 @@ class LruBitmapPool(private val initializeMaxSize: Long,
 
   companion object {
     const val TAG = "LruBitmapPool"
+    val DEFAULT_CONFIG = Bitmap.Config.ARGB_8888
 
     val defaultAllowedConfigs: Set<Bitmap.Config?>
       get() {
@@ -225,9 +225,9 @@ class LruBitmapPool(private val initializeMaxSize: Long,
     val defaultStrategy: LruPoolStrategy
       get() {
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
-          TODO("SizeConfigStrategy")
+          SizeConfigStrategy(BitmapHelperObject)
         } else {
-          return AttributeStrategy(BitmapHelperObject)
+          AttributeStrategy(BitmapHelperObject)
         }
       }
 

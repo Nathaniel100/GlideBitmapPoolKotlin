@@ -6,7 +6,7 @@ interface LruPoolStrategy {
 
   fun put(bitmap: Bitmap)
 
-  fun get(width: Int, height: Int, config: Bitmap.Config?): Bitmap?
+  fun get(width: Int, height: Int, config: Bitmap.Config): Bitmap?
 
   fun removeLast(): Bitmap?
 

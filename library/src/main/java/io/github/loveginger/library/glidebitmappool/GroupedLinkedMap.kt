@@ -2,7 +2,7 @@ package io.github.loveginger.library.glidebitmappool
 
 class GroupedLinkedMap<in K : Poolable, V> {
   private val head = LinkedEntry<K, V>()
-  private val keyToEntry = HashMap<K, LinkedEntry<K, V>>()
+  private val keyToEntry: MutableMap<K, LinkedEntry<K, V>> = HashMap()
 
   fun put(key: K, value: V) {
     var entry = keyToEntry[key]

@@ -11,7 +11,7 @@ class AttributeStrategy(private val bitmapHelper: BitmapHelper) : LruPoolStrateg
     groupedLinkedMap.put(key, bitmap)
   }
 
-  override fun get(width: Int, height: Int, config: Bitmap.Config?): Bitmap? {
+  override fun get(width: Int, height: Int, config: Bitmap.Config): Bitmap? {
     val key = keyPool.get(width, height, config)
     return groupedLinkedMap.get(key)
   }
@@ -81,12 +81,10 @@ class AttributeStrategy(private val bitmapHelper: BitmapHelper) : LruPoolStrateg
       fun create(bitmapHelper: BitmapHelper) = KeyPool(bitmapHelper)
     }
 
-    fun get(width: Int, height: Int, config: Bitmap.Config?): Key {
-      return get().apply { init(width, height, config) }
+    fun get(width: Int, height: Int, config: Bitmap.Config?) = get().apply {
+      init(width, height, config)
     }
 
-    override fun create(): Key {
-      return Key(bitmapHelper, this)
-    }
+    override fun create() = Key(bitmapHelper, this)
   }
 }
