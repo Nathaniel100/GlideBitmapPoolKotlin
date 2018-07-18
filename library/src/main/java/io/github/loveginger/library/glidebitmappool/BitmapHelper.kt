@@ -41,7 +41,9 @@ object BitmapHelperObject : BitmapHelper {
 
   override fun getBitmapByteSize(bitmap: Bitmap): Int {
     if (bitmap.isRecycled) {
-
+      throw IllegalStateException(
+          "Cannot obtail size for recycled bitmap: " +
+              "$bitmap[${bitmap.width} x ${bitmap.height}] ${bitmap.config}")
     }
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
       // Workaround for KitKat initial release NPE in Bitmap, fixed in MR1.
