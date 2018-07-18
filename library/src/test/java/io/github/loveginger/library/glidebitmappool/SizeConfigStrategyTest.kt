@@ -6,7 +6,7 @@ import com.nhaarman.mockitokotlin2.mock
 import io.github.loveginger.library.glidebitmappool.common.NoLoggerRule
 import org.hamcrest.CoreMatchers.`is`
 import org.hamcrest.CoreMatchers.nullValue
-import org.junit.Assert.*
+import org.junit.Assert.assertThat
 import org.junit.Rule
 import org.junit.Test
 import org.mockito.Mockito.verify
@@ -57,7 +57,7 @@ class SizeConfigStrategyTest {
   }
 
   @Test
-  fun putAndGet_keyNotMatch() {
+  fun putAndGet_sameConfig_noLargerSize() {
     strategy.put(mockBitmap1)
 
     val result = strategy.get(bitmapWidth2, bitmapHeight2, bitmapConfig2)
@@ -65,7 +65,15 @@ class SizeConfigStrategyTest {
   }
 
   @Test
-  fun putAndGet_getLargerThanPut() {
+  fun putAndGet_sameConfig_hasLargerSize() {
+    strategy.put(mockBitmap2)
+
+    val result = strategy.get(bitmapWidth1, bitmapHeight1, bitmapConfig1)
+    assertThat(result, `is`(mockBitmap2))
+  }
+
+  @Test
+  fun putAndGet_getMoreThanPut() {
     strategy.put(mockBitmap1)
 
     var result = strategy.get(bitmapWidth1, bitmapHeight1, bitmapConfig1)
@@ -80,5 +88,43 @@ class SizeConfigStrategyTest {
     strategy.createBitmap(bitmapWidth1, bitmapHeight1, bitmapConfig1)
 
     verify(bitmapHelper).createBitmap(bitmapWidth1, bitmapHeight1, bitmapConfig1)
+  }
+
+  @Test
+  fun removeLast() {
+    strategy.put(mockBitmap1)
+    strategy.put(mockBitmap2)
+
+    val result = strategy.removeLast()
+
+    assertThat(result, `is`(mockBitmap2))
+  }
+
+  @Test
+  fun removeLast_lastAfterGet() {
+    strategy.put(mockBitmap1)
+    strategy.put(mockBitmap2)
+
+    val getResult = strategy.get(bitmapWidth2, bitmapHeight2, bitmapConfig2)
+    assertThat(getResult, `is`(mockBitmap2))
+
+    val result = strategy.removeLast()
+    assertThat(result, `is`(mockBitmap1))
+  }
+
+  @Test
+  fun removeLast_empty() {
+    val result = strategy.removeLast()
+    assertThat(result, nullValue())
+  }
+
+  @Test
+  fun removeLast_emptyAfterPut() {
+    strategy.put(mockBitmap1)
+    strategy.put(mockBitmap2)
+    strategy.removeLast()
+    strategy.removeLast()
+    val result = strategy.removeLast()
+    assertThat(result, nullValue())
   }
 }

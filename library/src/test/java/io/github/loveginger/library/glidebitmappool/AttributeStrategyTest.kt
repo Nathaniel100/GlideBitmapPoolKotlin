@@ -37,6 +37,7 @@ class AttributeStrategyTest {
 
   var bitmapHelper: BitmapHelper = mock {
     on { createBitmap(bitmapWidth1, bitmapHeight1, bitmapConfig1) } doReturn (mockBitmap1)
+    on { createBitmap(bitmapWidth2, bitmapHeight2, bitmapConfig2) } doReturn (mockBitmap2)
   }
 
   var strategy: AttributeStrategy = AttributeStrategy(bitmapHelper)
@@ -58,7 +59,15 @@ class AttributeStrategyTest {
   }
 
   @Test
-  fun putAndGet_getLargerThanPut() {
+  fun putAndGet_keyNotMatch2() {
+    strategy.put(mockBitmap2)
+
+    val result = strategy.get(bitmapWidth1, bitmapHeight1, bitmapConfig1)
+    assertThat(result, nullValue())
+  }
+
+  @Test
+  fun putAndGet_getMoreThanPut() {
     strategy.put(mockBitmap1)
 
     var result = strategy.get(bitmapWidth1, bitmapHeight1, bitmapConfig1)
@@ -73,5 +82,43 @@ class AttributeStrategyTest {
     strategy.createBitmap(bitmapWidth1, bitmapHeight1, bitmapConfig1)
 
     verify(bitmapHelper).createBitmap(bitmapWidth1, bitmapHeight1, bitmapConfig1)
+  }
+
+  @Test
+  fun removeLast() {
+    strategy.put(mockBitmap1)
+    strategy.put(mockBitmap2)
+
+    val result = strategy.removeLast()
+
+    assertThat(result, `is`(mockBitmap2))
+  }
+
+  @Test
+  fun removeLast_lastAfterGet() {
+    strategy.put(mockBitmap1)
+    strategy.put(mockBitmap2)
+
+    val getResult = strategy.get(bitmapWidth2, bitmapHeight2, bitmapConfig2)
+    assertThat(getResult, `is`(mockBitmap2))
+
+    val result = strategy.removeLast()
+    assertThat(result, `is`(mockBitmap1))
+  }
+
+  @Test
+  fun removeLast_empty() {
+    val result = strategy.removeLast()
+    assertThat(result, nullValue())
+  }
+
+  @Test
+  fun removeLast_emptyAfterPut() {
+    strategy.put(mockBitmap1)
+    strategy.put(mockBitmap2)
+    strategy.removeLast()
+    strategy.removeLast()
+    val result = strategy.removeLast()
+    assertThat(result, nullValue())
   }
 }
