@@ -54,6 +54,18 @@ class GroupedLinkedMapTest {
   }
 
   @Test
+  fun putAndGet_sameKeyDifferentValue() {
+    groupedLinkedMap.put(Key(1), "1")
+    groupedLinkedMap.put(Key(1), "2")
+
+    val result1 = groupedLinkedMap.get(Key(1))
+    assertThat(result1, `is`("2"))
+
+    val result2 = groupedLinkedMap.get(Key(1))
+    assertThat(result2, `is`("1"))
+  }
+
+  @Test
   fun removeLast_emptyMap() {
     val result = groupedLinkedMap.removeLast()
     assertThat(result, nullValue())
@@ -63,6 +75,19 @@ class GroupedLinkedMapTest {
   fun removeLast_oneValue() {
     groupedLinkedMap.put(Key(1), "1")
     val result = groupedLinkedMap.removeLast()
+    assertThat(result, `is`("1"))
+  }
+
+  @Test
+  fun removeLast_sameKeyMoreValues() {
+    groupedLinkedMap.put(Key(1), "1")
+    groupedLinkedMap.put(Key(1), "2")
+    groupedLinkedMap.put(Key(1), "3")
+    var result = groupedLinkedMap.removeLast()
+    assertThat(result, `is`("3"))
+    result = groupedLinkedMap.removeLast()
+    assertThat(result, `is`("2"))
+    result = groupedLinkedMap.removeLast()
     assertThat(result, `is`("1"))
   }
 
